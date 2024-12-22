@@ -1,0 +1,185 @@
+﻿/*body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(120deg, #2980b9, #8e44ad);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    animation: slideIn 1.2s ease;
+}
+
+    .login-container h2 {
+        margin-bottom: 1.5rem;
+        color: #2c3e50;
+        font-size: 1.8rem;
+    }
+
+    .login-container input {
+        width: 100%;
+        padding: 0.8rem;
+        margin: 0.8rem 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border 0.3s ease;
+    }
+
+        .login-container input:focus {
+            border-color: #2980b9;
+            outline: none;
+        }
+
+    .login-container button {
+        width: 100%;
+        padding: 0.8rem;
+        border: none;
+        border-radius: 4px;
+        background: #2980b9;
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+        .login-container button:hover {
+            background: #1f6391;
+        }
+
+    .login-container .additional-links {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+
+        .login-container .additional-links a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+
+            .login-container .additional-links a:hover {
+                text-decoration: underline;
+            }*/
+
+/* Animation */
+/*@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}*/
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /*  background: linear-gradient(135deg, #6a11cb, #2575fc);*/
+    background: linear-gradient(to right, #1d2b64, #f8cdda);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2.5rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
+    border: 1px solid #ddd;
+}
+
+    .login-container h2 {
+        margin-bottom: 1.8rem;
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .login-container input {
+        width: 100%;
+        padding: 0.9rem;
+        margin: 1rem 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        background: #f9f9f9;
+    }
+
+        .login-container input:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+            outline: none;
+        }
+
+    .login-container button {
+        width: 100%;
+        padding: 0.9rem;
+        border: none;
+        border-radius: 5px;
+        background: linear-gradient(90deg, #2575fc, #6a11cb);
+        color: white;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .login-container button:hover {
+            background: linear-gradient(90deg, #1f4db5, #5a0cab);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+
+    .login-container .additional-links {
+        margin-top: 1.5rem;
+        font-size: 0.95rem;
+        color: #333;
+    }
+
+        .login-container .additional-links a {
+            color: #2575fc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            .login-container .additional-links a:hover {
+                text-decoration: underline;
+                color: #6a11cb;
+            }
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
