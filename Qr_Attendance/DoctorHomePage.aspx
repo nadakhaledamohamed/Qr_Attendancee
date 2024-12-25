@@ -1,42 +1,6 @@
-﻿<%--<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="DoctorHomePage.aspx.cs" Inherits="Qr_Attendance.DoctorHomePage" %>
+﻿
 
-<!DOCTYPE html>
-<html lang="en">
-<head runat="server">
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Doctor's Dashboard</title>
-    <link href="Style/DocStyle.css" rel="stylesheet" />
-</head>
-<body>
-    <form id="form1" runat="server" class="container">
-        <div class="header animated-fade">
-            <h1>Welcome, Doctor</h1>
-            <asp:Label ID="lblMessage" runat="server" ForeColor="Red" CssClass="message-label"></asp:Label>
-        </div>
-
-        <div class="content animated-slide-up">
-            <h2>Today's Lectures</h2>
-            <asp:GridView ID="gvLectures" runat="server" AutoGenerateColumns="True" CssClass="lectures-table" EmptyDataText="No lectures scheduled for today."></asp:GridView>
-        </div>
-
-        <div class="footer animated-slide-in">
-            <asp:Button ID="btnGenerateQR" runat="server" Text="Generate QR Code" CssClass="btn-generate" OnClick="btnGenerateQR_Click"></asp:Button>
-        </div>
-    </form>
-
-    <script>
-        // Animations for page load
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('.header').classList.add('visible');
-            document.querySelector('.content').classList.add('visible');
-            document.querySelector('.footer').classList.add('visible');
-        });
-    </script>
-</body>
-</html>--%>
-
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="DoctorHomePage.aspx.cs" Inherits="Qr_Attendance.DoctorHomePage" %>
+<%@ Page Language="C#"  AutoEventWireup="true" CodeBehind="DoctorHomePage.aspx.cs" Inherits="Qr_Attendance.DoctorHomePage" %>
 
 <!DOCTYPE html>
 <html lang="en">
