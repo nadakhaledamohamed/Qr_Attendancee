@@ -77,6 +77,10 @@
         <br />
         <asp:Button ID="btnBack" runat="server" Text="Back to Dashboard" OnClick="btnBack_Click" />
         <asp:Timer ID="Timer1" runat="server" Interval="25000" OnTick="Timer_Tick" Enabled="true" />
+        
+        <div>
+            <asp:Label ID="lblMessage" runat="server" CssClass="message-label"></asp:Label>
+        </div>
     </form>
 </body>
 </html>

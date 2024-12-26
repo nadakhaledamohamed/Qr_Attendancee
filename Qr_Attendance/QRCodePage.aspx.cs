@@ -19,23 +19,35 @@ namespace Qr_Attendance
         {
             if (!IsPostBack)
             {
-                if (Session["Schedule_ID"] == null || Session["People_ID"] == null)
+                if (Session["People_ID"] == null || Convert.ToInt32(Session["Role"]) != 2) // Ensure it's a doctor
                 {
-                    Response.Redirect("DoctorHomePage.aspx");
+                    Session.Clear();
+                    Response.Redirect("Login.aspx");
                     return;
                 }
+
+                int? scheduleId = GetCurrentScheduleID();
+                if (scheduleId == null)
+                {
+                    lblMessage.Text = "No active schedule found for the doctor.";
+                    return;
+                }
+
+                // Save doctor-specific session data
+                //Session["Doctor_ID"] = Session["People_ID"];
+                Session["Schedule_ID"] = scheduleId;
+
                 startTime = DateTime.Now;
                 endTime = startTime.AddSeconds(25);
 
-                // Save start and end time in the session
-                Session["StartTime"] = startTime;
+                 Session["StartTime"] = startTime;
+                
                 Session["EndTime"] = endTime;
-
+             
                 GenerateAndDisplayQRCode();
             }
             else
             {
-                // Retrieve start and end time from the session for subsequent loads
                 if (Session["StartTime"] != null && Session["EndTime"] != null)
                 {
                     startTime = (DateTime)Session["StartTime"];
@@ -44,8 +56,10 @@ namespace Qr_Attendance
             }
         }
 
+       
+
         protected void Timer_Tick(object sender, EventArgs e)
-        {
+            {
             startTime = endTime;
             endTime = startTime.AddSeconds(25);
 
@@ -58,10 +72,10 @@ namespace Qr_Attendance
         private void GenerateAndDisplayQRCode()
         {
             int scheduleId = Convert.ToInt32(Session["Schedule_ID"]);
-            int doctorId = Convert.ToInt32(Session["People_ID"]);
-           
+            int doctorId = Convert.ToInt32(Session["Doctor_ID"]);
+          
 
-           
+
             DateTime endTime = startTime.AddSeconds(25); // End time = start time + 25 seconds 
             string qrContent = GenerateQRContent(scheduleId, doctorId, startTime, endTime);
 
@@ -99,7 +113,41 @@ namespace Qr_Attendance
                 imgQRCode.ImageUrl = $"data:image/png;base64,{base64Image}";
             }
         }
-        
+        private int? GetCurrentScheduleID()
+        {
+            // Retrieve the logged-in user's People_ID from the session
+            int? loggedInPeopleId = Session["Doctor_ID"] != null ? Convert.ToInt32(Session["Doctor_ID"]) : (int?)null;
+
+            if (loggedInPeopleId == null)
+            {
+                // Redirect to login page if the session is not set
+                Response.Redirect("Login.aspx");
+                return null;
+            }
+
+            string connectionString = WebConfigurationManager.ConnectionStrings["DbConn"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("GetTodaysLecturesForDoctor", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                // Use the logged-in user's People_ID
+                cmd.Parameters.AddWithValue("@People_ID", loggedInPeopleId.Value);
+
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    return Convert.ToInt32(reader["Schedule_ID"]); // Return the Schedule_ID for the ongoing lecture
+                }
+                else
+                {
+                    return null; // No ongoing lecture found
+                }
+            }
+        }
         protected void btnBack_Click(object sender, EventArgs e)
         {
             Response.Redirect("DoctorHomePage.aspx");
