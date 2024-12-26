@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
@@ -16,11 +17,13 @@ namespace Qr_Attendance
         {
             if (!IsPostBack)
             {
-                Session.Clear(); // Clear session on page load
+               // Session.Clear(); // Clear session on page load
             }
         }
         protected void btnLogin_Click(object sender, EventArgs e)
         {
+           
+
             string username = txtUsername.Text.Trim();
             string password = txtPassword.Text.Trim();
             string connectionString = WebConfigurationManager.ConnectionStrings["DbConn"].ConnectionString;
@@ -45,27 +48,28 @@ namespace Qr_Attendance
 
                     if (role == 1) // Student role
                     {
-                        // Check if Schedule_ID exists in query string or session
-                        string scheduleId = Request.QueryString["Schedule_ID"];
-                        if (!string.IsNullOrEmpty(scheduleId))
+                        int? scheduleId = GetCurrentScheduleIDForStudent(peopleId);
+                        if (scheduleId != null)
                         {
-                            // Redirect back to StudentAttendancePage with Schedule_ID from query string
-                            Response.Redirect($"StudentAttendancePage.aspx?Schedule_ID={scheduleId}");
-                        }
-                        else if (Session["Schedule_ID"] != null)
-                        {
-                            // Redirect back to StudentAttendancePage with Schedule_ID from session
-                            scheduleId = Session["Schedule_ID"].ToString();
-                            Response.Redirect($"StudentAttendancePage.aspx?Schedule_ID={scheduleId}");
+                            // Save student-specific session data
+                            Session["Student_Schedule_ID"] = scheduleId;
+                            Session["Student_People_ID"] = peopleId;
+
+                            // Redirect to the aattendance page
+                            Response.Redirect($"StudentAttendancePage.aspx?Schedule_ID={scheduleId},Peopl_ID={peopleId}");
                         }
                         else
                         {
-                            // Default student home page
-                            Response.Redirect("StudentAttendancePage.aspx");
+                            Response.Redirect($"StudentAttendancePage.aspx");
                         }
                     }
                     else if (role == 2) // Doctor role
                     {
+                       
+                        // Save doctor-specific session data
+                        Session["Doctor_ID"] = peopleId;
+
+                        // Redirect to the doctor home page or QR Code page
                         Response.Redirect("DoctorHomePage.aspx");
                     }
                 }
@@ -75,5 +79,31 @@ namespace Qr_Attendance
                 }
             }
         }
+
+        // Helper method to get current schedule for the student
+        private int? GetCurrentScheduleIDForStudent(int studentId)
+        {
+            string connectionString = WebConfigurationManager.ConnectionStrings["DbConn"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("GetSchedualeForStd", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@People_ID", studentId);
+
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    return Convert.ToInt32(reader["Schedule_ID"]);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
     }
 }

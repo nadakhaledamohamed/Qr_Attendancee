@@ -29,7 +29,7 @@ namespace Qr_Attendance
 
         private int? GetLoggedInUserId()
         {
-            return Session["People_ID"] != null ? Convert.ToInt32(Session["People_ID"]) : (int?)null;
+            return Session["Doctor_ID"] != null ? Convert.ToInt32(Session["Doctor_ID"]) : (int?)null;
         }
 
         private void BindDoctorLectures(int peopleId)
@@ -90,7 +90,7 @@ namespace Qr_Attendance
         private int? GetCurrentScheduleID()
         {
             // Retrieve the logged-in user's People_ID from the session
-            int? loggedInPeopleId = Session["People_ID"] != null ? Convert.ToInt32(Session["People_ID"]) : (int?)null;
+            int? loggedInPeopleId = Session["Doctor_ID"] != null ? Convert.ToInt32(Session["Doctor_ID"]) : (int?)null;
 
             if (loggedInPeopleId == null)
             {
@@ -140,36 +140,45 @@ namespace Qr_Attendance
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                // Retrieve the End_Time as TIME from the Schedule table
-                SqlCommand fetchEndTimeCmd = new SqlCommand(
-                    "SELECT End_Time FROM Schedule WHERE Schedule_ID = @Schedule_ID", conn);
-                fetchEndTimeCmd.Parameters.AddWithValue("@Schedule_ID", scheduleID.Value);
-
-                conn.Open();
-                object endTimeObj = fetchEndTimeCmd.ExecuteScalar();
-
-                DateTime? endTime = null;
-                if (endTimeObj != null && endTimeObj != DBNull.Value)
+                try
                 {
-                    TimeSpan endTimeSpan = (TimeSpan)endTimeObj; // Cast to TimeSpan
-                    endTime = DateTime.Today.Add(endTimeSpan); // Combine with today's date
+                    conn.Open();
+
+                    // Insert attendance record
+                    SqlCommand cmd = new SqlCommand("INsertAttendance", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@People_ID", doctorId);
+                    cmd.Parameters.AddWithValue("@Schedule_ID", scheduleID.Value);
+                    cmd.Parameters.AddWithValue("@Status", 1); // Status: 1 for attended
+                    cmd.Parameters.AddWithValue("@Browser_Data", Request.UserAgent ?? string.Empty);
+                    cmd.Parameters.AddWithValue("@Attended_Time", DateTime.Now);
+
+
+                    //read start_time and end_time 
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            DateTime startTime = (DateTime)reader["Start_Time"]; // read start time and convert to date time 
+                            DateTime endTime = (DateTime)reader["End_Time"]; // read end time and convert to date time 
+
+                            ScriptManager.RegisterStartupScript(this, GetType(), "AttendanceLogged",
+                                $"console.log('Attendance logged successfully for Schedule_ID: {scheduleID.Value} with Start_Time: {startTime} and End_Time: {endTime}.');",
+                                true);
+                        }
+                        else
+                        {
+                            ScriptManager.RegisterStartupScript(this, GetType(), "NoTimesFound",
+                                "console.log('No Start_Time or End_Time found for the specified Schedule_ID.');", true);
+                        }
+                    }
                 }
-
-                // Insert attendance record
-                SqlCommand cmd = new SqlCommand("INsertAttendance", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@People_ID", doctorId);
-                cmd.Parameters.AddWithValue("@Schedule_ID", scheduleID.Value);
-                cmd.Parameters.AddWithValue("@Start_Time", DateTime.Now);
-                cmd.Parameters.AddWithValue("@End_Time", endTime.HasValue ? (object)endTime.Value : DBNull.Value);
-                cmd.Parameters.AddWithValue("@Status", 1); // Status: 1 for attended
-                cmd.Parameters.AddWithValue("@Browser_Data", Request.UserAgent);
-                cmd.Parameters.AddWithValue("@Attended_Time", DateTime.Now);
-
-                cmd.ExecuteNonQuery();
-
-                ScriptManager.RegisterStartupScript(this, GetType(), "AttendanceLogged",
-                    $"console.log('Attendance logged successfully for Schedule_ID: {scheduleID.Value} at {DateTime.Now}.');", true);
+                catch (Exception ex)
+                {
+                    // Log the exception or handle it as necessary
+                    ScriptManager.RegisterStartupScript(this, GetType(), "ErrorLoggingAttendance",
+                        $"console.log('Error logging attendance: {ex.Message}');", true);
+                }
             }
         }
     }
